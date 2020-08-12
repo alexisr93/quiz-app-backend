@@ -53,16 +53,17 @@ exports.signup_user = function(req, res) {
                   password: hashedPassword,
                   email: req.body.email
                 });
-              }
 
-              newUser.save(function(err, user) {
-                if (err) {
-                  res.json(err);
-                }
-                else {
-                  res.json(user);
-                }
-              });
+                newUser.save(function(err, user) {
+                  if (err) {
+                    res.json(err);
+                  }
+                  else {
+                    //TODO do not send back hashed password
+                    res.json(user);
+                  }
+                });
+              }
             });
           });
         }
@@ -152,14 +153,19 @@ exports.update_user = function(req, res) {
 };
 
 exports.delete_user = function(req, res) {
-  User.remove({
-    _id: req.params.userId
-  }, function(err, user) {
-    if (err){
-      res.send(err);
-    }
-    else {
-      res.json({ message: 'User deleted' });
-    }
-  });
+  if (req.body.username) {
+    User.remove({
+      username: req.body.username
+    }, function(err, user) {
+      if (err){
+        res.send(err);
+      }
+      else {
+        res.json({ message: 'User ' + req.body.username + ' deleted' });
+      }
+    });
+  }
+  else {
+    res.json("Error, delete failed");
+  }
 };
