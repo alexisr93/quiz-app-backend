@@ -22,7 +22,7 @@ exports.signup_user = function(req, res) {
   });
 
   let result;
-  
+
   if (req.body.username && req.body.password && req.body.email) {
     result = schema.validate(req.body);
   }
@@ -132,12 +132,23 @@ exports.get_all_users = function(req, res) {
 };
 
 exports.update_user = function(req, res) {
-  User.findOneAndUpdate({_id: req.params.userId}, req.body, {new: true}, function(err, user) {
-    if (err){
-      res.send(err);
-    }
-    res.json(user);
-  });
+  if (req.body.username && req.body.email){
+    User.findOneAndUpdate({
+      username: req.body.username
+    },
+    {
+      username: req.body.username,
+      email: req.body.email
+    }, {new: true}, function(err, user) {
+      if (err){
+        res.send(err);
+      }
+      res.json("Success");
+    });
+  }
+  else {
+    res.json("Error: No Data");
+  }
 };
 
 exports.delete_user = function(req, res) {
