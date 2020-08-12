@@ -21,7 +21,14 @@ exports.signup_user = function(req, res) {
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
   });
 
-  const result = schema.validate(req.body);
+  let result;
+  
+  if (req.body.username && req.body.password && req.body.email) {
+    result = schema.validate(req.body);
+  }
+  else {
+    return res.json('Error: No Data');
+  }
 
   if (result.error === undefined) {
     User.findOne({
@@ -69,36 +76,41 @@ exports.signup_user = function(req, res) {
 };
 
 exports.login_user = function(req, res) {
-  User.findOne({ username: req.body.username }, function(err, user) {
-    if (err) {
-      res.json(err);
-    }
-    else {
-      bcrypt.compare(req.body.password, user.password)
-        .then((result) => {
-          if (result) {
-            const payload = {
-              _id: user._id,
-              username: user.username
-            };
+  if (req.body.username && req.body.password){
+    User.findOne({ username: req.body.username }, function(err, user) {
+      if (err) {
+        res.json(err);
+      }
+      else {
+        bcrypt.compare(req.body.password, user.password)
+          .then((result) => {
+            if (result) {
+              const payload = {
+                _id: user._id,
+                username: user.username
+              };
 
-            jwt.sign(payload, TOKEN_SECRET, {
-              expiresIn: '1d'
-            }, (err, token) => {
-              if (err) {
-                res.json(err);
-              }
-              else {
-                res.json(token);
-              }
-            });
-          }
-          else {
-            res.json(result);
-          }
-        })
-    }
-  });
+              jwt.sign(payload, TOKEN_SECRET, {
+                expiresIn: '1d'
+              }, (err, token) => {
+                if (err) {
+                  res.json(err);
+                }
+                else {
+                  res.json(token);
+                }
+              });
+            }
+            else {
+              res.json(result);
+            }
+          })
+      }
+    });
+  }
+  else {
+    res.json('Error');
+  }
 };
 
 

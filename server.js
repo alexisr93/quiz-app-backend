@@ -18,7 +18,7 @@ mongoose.connect('mongodb://localhost/quizdb', { useNewUrlParser: true, useUnifi
 
 //Middleware
 app.use(cors());
-app.use(morgan('combined'));
+app.use(morgan('tiny'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
