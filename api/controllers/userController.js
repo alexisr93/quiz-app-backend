@@ -116,50 +116,6 @@ exports.login_user = function(req, res) {
   });
 };
 
-//This almost the ugliest function I have ever written, signup_user
-/*
-exports.login_user = function(req, res) {
-  if (req.body.username && req.body.password){
-    User.findOne({ username: req.body.username }, function(err, user) {
-      if (err) {
-        return res.json(err);
-      }
-      else if (user) {
-        bcrypt.compare(req.body.password, user.password)
-          .then((result) => {
-            if (result) {
-              const payload = {
-                _id: user._id,
-                username: user.username
-              };
-
-              jwt.sign(payload, TOKEN_SECRET, {
-                expiresIn: '1d'
-              }, (err, token) => {
-                if (err) {
-                  res.json(err);
-                }
-                else {
-                  res.json(token);
-                }
-              });
-            }
-            else {
-              res.json(result);
-            }
-          })
-      }
-      else {
-        return res.json('Error');
-      }
-    });
-  }
-  else {
-    res.json('Error');
-  }
-};
-*/
-
 exports.get_all_users = function(req, res) {
   User.find({}, function(err, users) {
     if (err) {
