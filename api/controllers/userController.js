@@ -1,67 +1,67 @@
-'use strict';
-let mongoose = require('mongoose');
-let User = mongoose.model('User');
-let Joi = require('joi');
-let bcrypt = require('bcryptjs');
-let jwt = require('jsonwebtoken');
-//Move this into a .env
+const mongoose = require('mongoose');
+const Joi = require('joi');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const User = mongoose.model('User');
+// Move this into a .env
 const TOKEN_SECRET = 'a;lskjfijuasbnhfjlasjkdfhpuiajeighjaksljkfh9348ut89ghuesjrkldvf-8954huasdf';
 
-exports.signup_user = function(req, res) {
+exports.signup_user = (req, res) => {
   const schema = Joi.object({
     username: Joi.string()
-        .alphanum()
-        .min(3)
-        .max(30)
-        .required(),
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required(),
 
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-        .required(),
+      .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+      .required(),
 
     email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+      .email({
+        minDomainSegments: 2,
+        tlds: {
+          allow: ['com', 'net'],
+        },
+      }),
   });
 
   let result;
 
   if (req.body.username && req.body.password && req.body.email) {
     result = schema.validate(req.body);
-  }
-  else {
+  } else {
     return res.json('Error: No Data');
   }
 
   if (result.error === undefined) {
     User.findOne({
-      username: req.body.username
-    }, function (err, user) {
+      username: req.body.username,
+    }, (err, user) => {
       if (err) {
         res.send(err);
-      }
-      else {
+      } else {
         if (user) {
           res.json('User already in database');
-        }
-        else {
-          bcrypt.genSalt(10, function(err, salt) {
-            bcrypt.hash(req.body.password, salt, function(err, hashedPassword) {
+        } else {
+          bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(req.body.password, salt, (err, hashedPassword) => {
               if (err) {
                 res.json(err);
-              }
-              else {
-                let newUser = new User({
+              } else {
+                const newUser = new User({
                   username: req.body.username,
                   password: hashedPassword,
-                  email: req.body.email
+                  email: req.body.email,
                 });
 
-                newUser.save(function(err, user) {
+                newUser.save((err, user) => {
                   if (err) {
                     res.json(err);
-                  }
-                  else {
-                    //TODO do not send back hashed password
+                  } else {
+                    // TODO do not send back hashed password
                     res.json(user);
                   }
                 });
@@ -71,16 +71,15 @@ exports.signup_user = function(req, res) {
         }
       }
     });
-  }
-  else {
+  } else {
     res.json(result.error);
   }
-
+  return res.json('Error');
 };
 
-exports.login_user = function(req, res) {
+exports.login_user = (req, res) => {
   if (!req.body.username || !req.body.password) {
-    return res.status(400).send({ "error" : "Need username and password" });
+    return res.status(400).send({ error: 'Need username and password' });
   }
 
   User.findOne({ username: req.body.username }, (err, user) => {
@@ -93,80 +92,73 @@ exports.login_user = function(req, res) {
           if (result) {
             const payload = {
               _id: user._id,
-              username: user.username
+              username: user.username,
             };
 
             jwt.sign(payload, TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
               if (err) {
                 return res.json(err);
               }
-              else {
-                return res.json({ 'token': token });
-              }
+              return res.json({ token });
             });
-          }
-          else {
-            return res.status(403).send({ "error": "Username and/or password does not match" });
+          } else {
+            return res.status(403).send({ error: 'Username and/or password does not match' });
           }
         });
-    }
-    else {
+    } else {
       return res.json('Error, did not find user');
     }
   });
 };
 
-exports.get_all_users = function(req, res) {
-  User.find({}, function(err, users) {
+exports.get_all_users = (req, res) => {
+  User.find({}, (err, users) => {
     if (err) {
       res.json(err);
-    }else {
-      let userList = users.map(function(user) {
-        return {
+    } else {
+      const userList = users.map((user) => {
+        return ({
           _id: user._id,
           username: user.username,
-          email: user.email
-        }
+          email: user.email,
+        });
       });
       res.json(userList);
     }
   });
 };
 
-exports.update_user = function(req, res) {
-  if (req.body.username && req.body.email){
+exports.update_user = (req, res) => {
+  if (req.body.username && req.body.email) {
     User.findOneAndUpdate({
-      username: req.body.username
+      username: req.body.username,
     },
     {
       username: req.body.username,
-      email: req.body.email
-    }, {new: true}, function(err, user) {
-      if (err){
+      email: req.body.email,
+    }, { new: true }, (err) => {
+      if (err) {
         res.send(err);
       }
-      res.json("Success");
+      res.json('Success');
     });
-  }
-  else {
-    res.json("Error: No Data");
+  } else {
+    res.json('Error: No Data');
   }
 };
 
-exports.delete_user = function(req, res) {
+exports.delete_user = (req, res) => {
   if (req.body.username) {
     User.remove({
-      username: req.body.username
-    }, function(err, user) {
-      if (err){
+      username: req.body.username,
+    }, (err) => {
+      if (err) {
         res.send(err);
-      }
-      else {
-        res.json({ message: 'User ' + req.body.username + ' deleted' });
+      } else {
+        res.json({ message: `User ${req.body.username} deleted` });
       }
     });
-  }
-  else {
-    res.json("Error, delete failed");
+  } else {
+    res.json('Error, delete failed');
   }
 };
