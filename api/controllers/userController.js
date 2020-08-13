@@ -16,7 +16,9 @@ exports.signup_user = function(req, res) {
         .required(),
 
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+        .required(),
+
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
   });
@@ -77,12 +79,52 @@ exports.signup_user = function(req, res) {
 };
 
 exports.login_user = function(req, res) {
+  if (!req.body.username || !req.body.password) {
+    return res.status(400).send({ "error" : "Need username and password" });
+  }
+
+  User.findOne({ username: req.body.username }, (err, user) => {
+    if (err) {
+      return res.json(err);
+    }
+    if (user) {
+      bcrypt.compare(req.body.password, user.password)
+        .then((result) => {
+          if (result) {
+            const payload = {
+              _id: user._id,
+              username: user.username
+            };
+
+            jwt.sign(payload, TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
+              if (err) {
+                return res.json(err);
+              }
+              else {
+                return res.json({ 'token': token });
+              }
+            });
+          }
+          else {
+            return res.status(403).send({ "error": "Username and/or password does not match" });
+          }
+        });
+    }
+    else {
+      return res.json('Error, did not find user');
+    }
+  });
+};
+
+//This almost the ugliest function I have ever written, signup_user
+/*
+exports.login_user = function(req, res) {
   if (req.body.username && req.body.password){
     User.findOne({ username: req.body.username }, function(err, user) {
       if (err) {
-        res.json(err);
+        return res.json(err);
       }
-      else {
+      else if (user) {
         bcrypt.compare(req.body.password, user.password)
           .then((result) => {
             if (result) {
@@ -107,13 +149,16 @@ exports.login_user = function(req, res) {
             }
           })
       }
+      else {
+        return res.json('Error');
+      }
     });
   }
   else {
     res.json('Error');
   }
 };
-
+*/
 
 exports.get_all_users = function(req, res) {
   User.find({}, function(err, users) {
