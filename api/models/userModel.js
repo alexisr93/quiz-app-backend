@@ -11,6 +11,7 @@ let UserSchema = new Schema({
       id: Number,
       title: String,
       description: String,
+      createdBy: String,
       is_public: Boolean,
       questions: [{
         question: String,

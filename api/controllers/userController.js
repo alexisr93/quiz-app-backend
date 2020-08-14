@@ -6,28 +6,27 @@ const jwt = require('jsonwebtoken');
 const User = mongoose.model('User');
 // Move this into a .env
 const TOKEN_SECRET = 'a;lskjfijuasbnhfjlasjkdfhpuiajeighjaksljkfh9348ut89ghuesjrkldvf-8954huasdf';
+const schema = Joi.object({
+  username: Joi.string()
+    .alphanum()
+    .min(3)
+    .max(30)
+    .required(),
+
+  password: Joi.string()
+    .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+    .required(),
+
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: {
+        allow: ['com', 'net'],
+      },
+    }),
+});
 
 exports.signup_user = (req, res) => {
-  const schema = Joi.object({
-    username: Joi.string()
-      .alphanum()
-      .min(3)
-      .max(30)
-      .required(),
-
-    password: Joi.string()
-      .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-      .required(),
-
-    email: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        tlds: {
-          allow: ['com', 'net'],
-        },
-      }),
-  });
-
   let result;
 
   if (req.body.username && req.body.password && req.body.email) {
@@ -42,39 +41,34 @@ exports.signup_user = (req, res) => {
     }, (err, user) => {
       if (err) {
         res.send(err);
+      } else if (user) {
+        res.json('User already in database');
       } else {
-        if (user) {
-          res.json('User already in database');
-        } else {
-          bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(req.body.password, salt, (err, hashedPassword) => {
+        bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
+          if (err) {
+            res.json(err);
+          } else {
+            const newUser = new User({
+              username: req.body.username,
+              password: hashedPassword,
+              email: req.body.email,
+            });
+
+            newUser.save((err, user) => {
               if (err) {
                 res.json(err);
               } else {
-                const newUser = new User({
-                  username: req.body.username,
-                  password: hashedPassword,
-                  email: req.body.email,
-                });
-
-                newUser.save((err, user) => {
-                  if (err) {
-                    res.json(err);
-                  } else {
-                    // TODO do not send back hashed password
-                    res.json(user);
-                  }
-                });
+                // TODO do not send back hashed password
+                res.json(user);
               }
             });
-          });
-        }
+          }
+        });
       }
     });
   } else {
     res.json(result.error);
   }
-  return res.json('Error');
 };
 
 exports.login_user = (req, res) => {
@@ -149,7 +143,7 @@ exports.update_user = (req, res) => {
 
 exports.delete_user = (req, res) => {
   if (req.body.username) {
-    User.remove({
+    User.deleteOne({
       username: req.body.username,
     }, (err) => {
       if (err) {
