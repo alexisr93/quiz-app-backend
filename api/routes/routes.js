@@ -1,22 +1,23 @@
-'use strict';
-module.exports = function(app) {
-  let quiz = require('../controllers/quizController');
-  let user = require('../controllers/userController');
+module.exports = (app) => {
+  const quiz = require('../controllers/quizController');
+  const user = require('../controllers/userController');
 
   app.route('/quizzes')
-    .get(quiz.list_all_quizzes)
     .post(quiz.create_quiz);
 
-  app.route('/quizzes/:quizId')
-    .get(quiz.read_quiz)
+  app.route('/quizzes/:username')
+    .get(quiz.list_users_quizzes)
     .put(quiz.update_quiz)
     .delete(quiz.delete_quiz);
+
+  app.route('/quiz/:username/:id')
+    .get(quiz.read_quiz);
 
   app.route('/signup')
     .post(user.signup_user);
 
   app.route('/login')
-    .post(user.login_user)
+    .post(user.login_user);
 
   app.route('/user')
     .get(user.get_all_users)

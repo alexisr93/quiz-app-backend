@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const Quiz = mongoose.model('Quiz');
 const User = mongoose.model('User');
 
-exports.list_all_quizzes = (req, res) => {
-  Quiz.find({}, (err, quiz) => {
+exports.list_users_quizzes = (req, res) => {
+  User.findOne({ username: req.params.username }, (err, user) => {
     if (err) {
       res.send(err);
     }
-    res.json(quiz);
+    res.json(user.quizzes);
   });
 };
 
@@ -25,10 +25,11 @@ exports.create_quiz = (req, res) => {
 };
 
 exports.read_quiz = (req, res) => {
-  Quiz.findById(req.params.quizId, (err, quiz) => {
+  User.findOne({ username: req.params.username }, (err, user) => {
     if (err) {
       res.send(err);
     }
+    const quiz = user.quizzes.find((element) => element._id == req.params.id);
     res.json(quiz);
   });
 };

@@ -1,9 +1,8 @@
-'use strict';
+const mongoose = require('mongoose');
 
-let mongoose = require('mongoose');
-let Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-let QuizSchema = new Schema({
+const QuizSchema = new Schema({
   title: String,
   description: String,
   createdBy: String,
@@ -13,7 +12,7 @@ let QuizSchema = new Schema({
     answer2: String,
     answer3: String,
     answer4: String,
-    correct_answer: String
+    correct_answer: String,
   }],
 });
 
