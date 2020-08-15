@@ -34,13 +34,23 @@ exports.read_quiz = (req, res) => {
   });
 };
 
-exports.update_quiz = (req, res) => {
-  Quiz.findOneAndUpdate({ _id: req.params.quizId }, req.body, { new: true }, (err, quiz) => {
+exports.add_question_to_quiz = (req, res) => {
+  User.findOne({ username: req.params.username }, (err, user) =>{
     if (err) {
       res.send(err);
-      console.log('Tried to updated, failed');
     }
-    res.json(quiz);
+    const quizIndex = user.quizzes.findIndex((element) => element._id == req.params.id);
+
+    user.save(user.quizzes[0].questions.push({
+      'question': req.body.question,
+      'answer1': req.body.answer1,
+      'answer2': req.body.answer2,
+      'answer3': req.body.answer3,
+      'answer4': req.body.answer4,
+      'correct_answer': req.body.correctAnswer,
+    }));
+
+    res.json(user.quizzes[quizIndex]);
   });
 };
 
