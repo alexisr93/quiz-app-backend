@@ -14,11 +14,11 @@ const UserSchema = new Schema({
     is_public: Boolean,
     questions: [{
       question: String,
-      answer1: String,
-      answer2: String,
-      answer3: String,
-      answer4: String,
-      correct_answer: String,
+      option1: String,
+      option2: String,
+      option3: String,
+      option4: String,
+      correctAnswer: String,
     }],
   }],
   results: [{

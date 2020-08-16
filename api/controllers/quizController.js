@@ -43,11 +43,11 @@ exports.add_question_to_quiz = (req, res) => {
 
     user.save(user.quizzes[quizIndex].questions.push({
       'question': req.body.question,
-      'answer1': req.body.answer1,
-      'answer2': req.body.answer2,
-      'answer3': req.body.answer3,
-      'answer4': req.body.answer4,
-      'correct_answer': req.body.correctAnswer,
+      'option1': req.body.option1,
+      'option2': req.body.option2,
+      'option3': req.body.option3,
+      'option4': req.body.option4,
+      'correctAnswer': req.body.correctAnswer,
     }));
 
     res.json(user.quizzes[quizIndex]);
@@ -66,11 +66,11 @@ exports.update_question = (req, res) => {
 
     user.save(user.quizzes[quizIndex].questions[questionIndex] = {
       'question': req.body.question,
-      'answer1': req.body.answer1,
-      'answer2': req.body.answer2,
-      'answer3': req.body.answer3,
-      'answer4': req.body.answer4,
-      'correct_answer': req.body.correctAnswer,
+      'option1': req.body.option1,
+      'option2': req.body.option2,
+      'option3': req.body.option3,
+      'option4': req.body.option4,
+      'correctAnswer': req.body.correctAnswer,
     });
 
     res.json(user.quizzes[quizIndex]);
