@@ -7,11 +7,14 @@ module.exports = (app) => {
 
   app.route('/quizzes/:username')
     .get(quiz.list_users_quizzes)
-    .delete(quiz.delete_quiz);
+    .delete(quiz.delete_quiz)
+    //.patch(quiz.update_quizInfo);
 
-  app.route('/quiz/:username/:id')
+  app.route('/quiz/:username/:quizId')
     .put(quiz.add_question_to_quiz)
-    .get(quiz.read_quiz);
+    .get(quiz.read_quiz)
+    .patch(quiz.update_question)
+    .delete(quiz.delete_question);
 
   app.route('/signup')
     .post(user.signup_user);
