@@ -102,12 +102,13 @@ exports.update_quiz_data = (req, res) => {
 };
 
 exports.delete_quiz = (req, res) => {
-  Quiz.remove({
-    _id: req.params.quizId,
-  }, (err) => {
-    if (err) {
-      res.send(err);
-    }
-    res.json({ message: 'Quiz deleted' });
+  User.update(
+    { "username": req.params.username },
+    { $pull: { "quizzes": { "_id": req.body.quizId }}},
+    (err, user) => {
+      if (err) {
+        res.send(err);
+      }
+      res.json('ok');
   });
 };
