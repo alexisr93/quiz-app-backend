@@ -8,7 +8,7 @@ module.exports = (app) => {
   app.route('/quizzes/:username')
     .get(quiz.list_users_quizzes)
     .delete(quiz.delete_quiz)
-    //.patch(quiz.update_quizInfo);
+    .patch(quiz.update_quiz_data);
 
   app.route('/quiz/:username/:quizId')
     .put(quiz.add_question_to_quiz)

@@ -89,6 +89,18 @@ exports.delete_question = (req, res) => {
   });
 };
 
+exports.update_quiz_data = (req, res) => {
+  User.findOneAndUpdate(
+    { "username": req.params.username, "quizzes._id": req.body.id },
+    { "quizzes.$.title": req.body.quizTitle, "quizzes.$.description": req.body.quizDescription },
+    (err, user) => {
+      if (err) {
+        res.send(err);
+      }
+      res.json('ok');
+  });
+};
+
 exports.delete_quiz = (req, res) => {
   Quiz.remove({
     _id: req.params.quizId,
