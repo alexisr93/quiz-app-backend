@@ -104,7 +104,7 @@ exports.update_quiz_data = (req, res) => {
 exports.delete_quiz = (req, res) => {
   User.update(
     { "username": req.params.username },
-    { $pull: { "quizzes": { "_id": req.body.quizId }}},
+    { $pull: { "quizzes": { "_id": req.body.id }}},
     (err, user) => {
       if (err) {
         res.send(err);
