@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { tokenSecret } = require('../../config.js');
 
 const User = mongoose.model('User');
-// Move this into a .env
-const TOKEN_SECRET = 'a;lskjfijuasbnhfjlasjkdfhpuiajeighjaksljkfh9348ut89ghuesjrkldvf-8954huasdf';
+
 const schema = Joi.object({
   username: Joi.string()
     .alphanum()
@@ -89,7 +89,7 @@ exports.login_user = (req, res) => {
               username: user.username,
             };
 
-            jwt.sign(payload, TOKEN_SECRET, { expiresIn: '1d' }, (err, token) => {
+            jwt.sign(payload, tokenSecret, { expiresIn: '1d' }, (err, token) => {
               if (err) {
                 return res.json(err);
               }

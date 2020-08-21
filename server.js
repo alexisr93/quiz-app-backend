@@ -7,8 +7,7 @@ const morgan = require('morgan');
 const routes = require('./api/routes/routes');
 const Quiz = require('./api/models/quizModel');
 const User = require('./api/models/userModel');
-
-const port = process.env.PORT || 4000;
+const { port } = require('./config.js');
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/quizdb', { useNewUrlParser: true, useUnifiedTopology: true });
