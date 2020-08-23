@@ -1,39 +1,34 @@
+const { tokenSecret } = require('../../config.js');
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { tokenSecret } = require('../../config.js');
 
 const User = mongoose.model('User');
 
-const schema = Joi.object({
-  username: Joi.string()
-    .alphanum()
-    .min(3)
-    .max(30)
-    .required(),
-
-  password: Joi.string()
-    .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-    .required(),
-
-  email: Joi.string()
-    .email({
-      minDomainSegments: 2,
-      tlds: {
-        allow: ['com', 'net'],
-      },
-    }),
-});
 
 exports.signup_user = (req, res) => {
-  let result;
+  const schema = Joi.object({
+    username: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required(),
 
-  if (req.body.username && req.body.password && req.body.email) {
-    result = schema.validate(req.body);
-  } else {
-    return res.json('Error: No Data');
-  }
+    password: Joi.string()
+      .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+      .required(),
+
+    email: Joi.string()
+      .email({
+        minDomainSegments: 2,
+        tlds: {
+          allow: ['com', 'net'],
+        },
+      }),
+  });
+  
+  let result = schema.validate(req.body);
 
   if (result.error === undefined) {
     User.findOne({
