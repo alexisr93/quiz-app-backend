@@ -1,3 +1,4 @@
+const { port, mongodbHost } = require('./config.js');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -7,10 +8,9 @@ const morgan = require('morgan');
 const routes = require('./api/routes/routes');
 const Quiz = require('./api/models/quizModel');
 const User = require('./api/models/userModel');
-const { port } = require('./config.js');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/quizdb', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongodbHost, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(cors());
 app.use(morgan('tiny'));
