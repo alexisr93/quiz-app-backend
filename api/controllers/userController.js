@@ -1,4 +1,5 @@
 const { tokenSecret } = require('../../config.js');
+const joiSchema = require('./validationSchemas.js');
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
@@ -6,69 +7,49 @@ const jwt = require('jsonwebtoken');
 
 const User = mongoose.model('User');
 
-
 exports.signup_user = (req, res) => {
-  const schema = Joi.object({
-    username: Joi.string()
-      .alphanum()
-      .min(3)
-      .max(30)
-      .required(),
+  let validation = joiSchema.signupSchema.validate(req.body);
 
-    password: Joi.string()
-      .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-      .required(),
-
-    email: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        tlds: {
-          allow: ['com', 'net'],
-        },
-      }),
-  });
-  
-  let result = schema.validate(req.body);
-
-  if (result.error === undefined) {
-    User.findOne({
-      username: req.body.username,
-    }, (err, user) => {
-      if (err) {
-        res.send(err);
-      } else if (user) {
-        res.json('User already in database');
-      } else {
-        bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-          if (err) {
-            res.json(err);
-          } else {
-            const newUser = new User({
-              username: req.body.username,
-              password: hashedPassword,
-              email: req.body.email,
-            });
-
-            newUser.save((err, user) => {
-              if (err) {
-                res.json(err);
-              } else {
-                // TODO do not send back hashed password
-                res.json(user);
-              }
-            });
-          }
-        });
-      }
-    });
-  } else {
-    res.json(result.error);
+  if (validation.error) {
+    return res.status(400).send({ error: 'Bad data' });
   }
+
+  User.findOne({
+    username: req.body.username,
+  }, (err, user) => {
+    if (err) {
+      res.send(err);
+    } else if (user) {
+      res.json('User already in database');
+    } else {
+      bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
+        if (err) {
+          res.json(err);
+        } else {
+          const newUser = new User({
+            username: req.body.username,
+            password: hashedPassword,
+            email: req.body.email,
+          });
+
+          newUser.save((err, user) => {
+            if (err) {
+              res.json(err);
+            } else {
+              res.json({ message: "Success" });
+            }
+          });
+        }
+      });
+    }
+  });
 };
 
 exports.login_user = (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    return res.status(400).send({ error: 'Need username and password' });
+  let validation = joiSchema.loginUserSchema.validate(req.body);
+
+  if (validation.error) {
+    return res.status(400).send({ error: 'Need username and/or password' });
   }
 
   User.findOne({ username: req.body.username }, (err, user) => {
@@ -118,36 +99,40 @@ exports.get_all_users = (req, res) => {
 };
 
 exports.update_user = (req, res) => {
-  if (req.body.username && req.body.email) {
-    User.findOneAndUpdate({
-      username: req.body.username,
-    },
-    {
-      username: req.body.username,
-      email: req.body.email,
-    }, { new: true }, (err) => {
-      if (err) {
-        res.send(err);
-      }
-      res.json('Success');
-    });
-  } else {
-    res.json('Error: No Data');
+  let validation = joiSchema.updateUserSchema.validate(req.body);
+
+  if (validation.error) {
+    return res.status(400).send({ error: 'Need username' });
   }
+
+  User.findOneAndUpdate({
+    username: req.body.username,
+  },
+  {
+    username: req.body.username,
+    email: req.body.email,
+  }, { new: true }, (err) => {
+    if (err) {
+      res.send(err);
+    }
+    res.json('Success');
+  });
 };
 
 exports.delete_user = (req, res) => {
-  if (req.body.username) {
-    User.deleteOne({
-      username: req.body.username,
-    }, (err) => {
-      if (err) {
-        res.send(err);
-      } else {
-        res.json({ message: `User ${req.body.username} deleted` });
-      }
-    });
-  } else {
-    res.json('Error, delete failed');
+  let validation = joiSchema.deleteUserSchema.validate(req.body);
+
+  if (validation.error) {
+    return res.status(400).send({ error: "Need username" });
   }
+
+  User.deleteOne({
+    username: req.body.username,
+  }, (err) => {
+    if (err) {
+      res.send(err);
+    } else {
+      res.json({ message: `User ${req.body.username} deleted` });
+    }
+  });
 };
