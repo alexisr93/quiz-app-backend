@@ -136,3 +136,40 @@ exports.delete_user = (req, res) => {
     }
   });
 };
+
+exports.get_results = (req, res) => {
+  let validation = joiSchema.getResultsSchema.validate(req.params);
+
+  if (validation.error) {
+    return res.status(400).send({ error: 'Need username' });
+  }
+
+  User.findOne({ username: req.params.username }, (err, user) => {
+    if (err) {
+      res.send(err);
+    }
+    res.json(user.results);
+  });
+};
+
+exports.save_result = (req, res) => {
+  let validation = joiSchema.saveResultSchema.validate(req.body);
+
+  if (validation.error) {
+    return res.status(400).send({ error: 'Need username' });
+  }
+
+  User.findOne({ username: req.params.username }, (err, user) => {
+    if (err) {
+      res.send(err);
+    }
+
+    user.save(user.results.push({
+        'quizTitle': req.body.quizTitle,
+        'dateQuizTaken': req.body.dateQuizTaken,
+        'quizScore': req.body.quizScore,
+      }));
+
+    res.json(user.results);
+  });
+};

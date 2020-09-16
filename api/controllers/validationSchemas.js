@@ -129,3 +129,18 @@ exports.deleteQuizSchema = Joi.object({
   id: Joi.string()
     .required(),
 });
+
+exports.getResultsSchema = Joi.object({
+  username: Joi.string()
+    .required(),
+});
+
+exports.saveResultSchema = Joi.object({
+  quizTitle: Joi.string()
+    .required(),
+  dateQuizTaken: Joi.date()
+    .required(),
+  quizScore: Joi.string()
+    .alphanum()
+    .required(),
+})

@@ -26,4 +26,8 @@ module.exports = (app) => {
     .get(user.get_all_users)
     .put(user.update_user)
     .delete(user.delete_user);
+
+  app.route('/results/:username')
+    .put(user.save_result)
+    .get(user.get_results)
 };
