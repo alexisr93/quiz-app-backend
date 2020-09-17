@@ -138,9 +138,8 @@ exports.getResultsSchema = Joi.object({
 exports.saveResultSchema = Joi.object({
   quizTitle: Joi.string()
     .required(),
-  dateQuizTaken: Joi.date()
+  dateQuizTaken: Joi.string()
     .required(),
   quizScore: Joi.string()
-    .alphanum()
     .required(),
-})
+});

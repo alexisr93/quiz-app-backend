@@ -28,6 +28,6 @@ module.exports = (app) => {
     .delete(user.delete_user);
 
   app.route('/results/:username')
-    .put(user.save_result)
+    .post(user.save_result)
     .get(user.get_results)
 };

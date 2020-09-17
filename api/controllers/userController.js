@@ -148,6 +148,7 @@ exports.get_results = (req, res) => {
     if (err) {
       res.send(err);
     }
+    console.log(user.results);
     res.json(user.results);
   });
 };
@@ -156,7 +157,7 @@ exports.save_result = (req, res) => {
   let validation = joiSchema.saveResultSchema.validate(req.body);
 
   if (validation.error) {
-    return res.status(400).send({ error: 'Need username' });
+    return res.status(400).send({ error: 'Bad data' });
   }
 
   User.findOne({ username: req.params.username }, (err, user) => {
@@ -170,6 +171,6 @@ exports.save_result = (req, res) => {
         'quizScore': req.body.quizScore,
       }));
 
-    res.json(user.results);
+    res.json({ message: "Ok" });
   });
 };

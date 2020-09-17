@@ -22,9 +22,9 @@ const UserSchema = new Schema({
     }],
   }],
   results: [{
-    dateQuizTaken: Date,
+    dateQuizTaken: String,
     quizTitle: String,
-    quizScore: Number,
+    quizScore: String,
   }],
 });
 
